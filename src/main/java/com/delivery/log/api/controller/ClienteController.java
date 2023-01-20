@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.delivery.log.domain.model.Cliente;
 import com.delivery.log.domain.repository.ClienteRepository;
+import com.delivery.log.domain.service.CatalagoClienteService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ import lombok.AllArgsConstructor;
 public class ClienteController {
 	
 	private ClienteRepository clienteRepository;
-	
+	private CatalagoClienteService catalagoService;
 	@GetMapping
 	public List<Cliente> listar() {
 		return clienteRepository.findAll();
@@ -37,20 +38,12 @@ public class ClienteController {
 		return clienteRepository.findById(clienteId)
 				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
-		
-		//Optional<Cliente> cliente = clienteRepository.findById(clienteId);
-		
-		//if(cliente.isPresent()) {
-		//	return ResponseEntity.ok(cliente.get());
-		//}
-		
-		//return ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
-		return clienteRepository.save(cliente);
+		return catalagoService.salvar(cliente);
 	}
 	
 	@PutMapping("/{clienteId}")
@@ -60,7 +53,8 @@ public class ClienteController {
 		}
 		
 		cliente.setId(clienteId);
-		cliente = clienteRepository.save(cliente);
+//		cliente = clienteRepository.save(cliente);
+		cliente = catalagoService.salvar(cliente);
 		return ResponseEntity.ok(cliente);
 	}
 	
@@ -70,7 +64,8 @@ public class ClienteController {
 			return ResponseEntity.notFound().build();
 		}
 		
-		clienteRepository.deleteById(clienteId);
+//		clienteRepository.deleteById(clienteId);
+		catalagoService.excluir(clienteId);
 		return ResponseEntity.noContent().build();
 	}
 
